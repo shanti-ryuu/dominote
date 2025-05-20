@@ -10,9 +10,10 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _isAuthenticated;
   bool get isPinSet => _isPinSet;
   
-  Future<void> checkPinStatus() async {
+  Future<bool> checkPinStatus() async {
     _isPinSet = await _databaseService.isPinSet();
     notifyListeners();
+    return _isPinSet;
   }
   
   Future<bool> verifyPin(String pin) async {
@@ -30,6 +31,20 @@ class AuthProvider with ChangeNotifier {
     await _databaseService.setPin(pin);
     _isPinSet = true;
     _isAuthenticated = true;
+    notifyListeners();
+  }
+  
+  Future<void> resetPin() async {
+    // Reset the PIN in the database
+    await _databaseService.deletePin();
+    
+    // Reset authentication state
+    _isPinSet = false;
+    _isAuthenticated = false;
+    
+    // Clear all user data (optional, depending on requirements)
+    await _databaseService.clearAllData();
+    
     notifyListeners();
   }
   

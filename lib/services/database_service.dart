@@ -180,4 +180,47 @@ class DatabaseService {
     await _foldersBox.close();
     await _pinBox.close();
   }
+  
+  // Delete PIN
+  Future<void> deletePin() async {
+    await _pinBox.clear();
+  }
+  
+  // Clear all user data
+  Future<void> clearAllData() async {
+    // Keep a reference to the default folder ID
+    String? defaultFolderId;
+    if (_foldersBox.isNotEmpty) {
+      try {
+        final defaultFolder = _foldersBox.values.firstWhere((folder) => folder.name == 'All Notes');
+        defaultFolderId = defaultFolder.id;
+      } catch (_) {
+        // No default folder found
+      }
+    }
+    
+    // Clear all notes
+    await _notesBox.clear();
+    
+    // Clear all folders except the default one
+    await _foldersBox.clear();
+    
+    // Recreate default folder if it existed
+    if (defaultFolderId != null) {
+      final defaultFolder = Folder(
+        id: defaultFolderId,
+        name: 'All Notes',
+        createdAt: DateTime.now(),
+      );
+      await _foldersBox.put(defaultFolder.id, defaultFolder);
+    } else {
+      // Create a new default folder
+      final defaultFolder = Folder(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: 'All Notes',
+        createdAt: DateTime.now(),
+      );
+      await _foldersBox.put(defaultFolder.id, defaultFolder);
+    }
+  }
 }
