@@ -33,6 +33,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Include the build/web directory for Netlify deployment
+!/build/web/
+
 # Symbolication related
 app.*.symbols
 
