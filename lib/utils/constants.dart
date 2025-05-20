@@ -6,6 +6,8 @@ class AppConstants {
   static const String splashRoute = '/';
   static const String pinSetupRoute = '/pin-setup';
   static const String pinLoginRoute = '/pin-login';
+  static const String pinAuthRoute = '/pin-auth';
+  static const String pinResetRoute = '/pin-reset';
   static const String homeRoute = '/home';
   static const String noteEditorRoute = '/note-editor';
   static const String folderSelectionRoute = '/folder-selection';
@@ -20,6 +22,6 @@ class AppConstants {
   static const double smallPadding = 8.0;
   static const double largePadding = 24.0;
   
-  // PIN Constants
-  static const int pinLength = 4;
+  // Authentication Constants
+  static const int pinLength = 6;
 }

@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     await authProvider.checkPinStatus();
     
     if (authProvider.isPinSet) {
-      Navigator.pushReplacementNamed(context, AppConstants.pinLoginRoute);
+      Navigator.pushReplacementNamed(context, AppConstants.pinAuthRoute);
     } else {
       Navigator.pushReplacementNamed(context, AppConstants.pinSetupRoute);
     }

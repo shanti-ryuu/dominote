@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'providers/notes_provider.dart';
 import 'providers/folders_provider.dart';
@@ -11,17 +10,13 @@ import 'services/theme_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/pin_setup_screen.dart';
 import 'screens/pin_login_screen.dart';
+import 'screens/pin_auth_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/note_editor_screen.dart';
 import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Force cache refresh for web
-  if (kIsWeb) {
-    await Future.delayed(const Duration(milliseconds: 100));
-  }
   
   // Initialize services
   final databaseService = DatabaseService();
@@ -64,6 +59,8 @@ class MyApp extends StatelessWidget {
               AppConstants.splashRoute: (context) => const SplashScreen(),
               AppConstants.pinSetupRoute: (context) => const PinSetupScreen(),
               AppConstants.pinLoginRoute: (context) => const PinLoginScreen(),
+              AppConstants.pinAuthRoute: (context) => const PinAuthScreen(),
+              AppConstants.pinResetRoute: (context) => const PinSetupScreen(isReset: true),
               AppConstants.homeRoute: (context) => const HomeScreen(),
               AppConstants.noteEditorRoute: (context) => const NoteEditorScreen(),
             },
