@@ -37,6 +37,8 @@ class _PinSetupScreenState extends State<PinSetupScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
     
     return Scaffold(
       appBar: AppBar(
@@ -54,21 +56,43 @@ class _PinSetupScreenState extends State<PinSetupScreen> with SingleTickerProvid
               },
               tooltip: 'Go back',
             ),
+          if (!_isConfirmingPin && isMobile)
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openEndDrawer();
+                },
+                tooltip: 'Account Options',
+              ),
+            ),
         ],
       ),
+      endDrawer: !_isConfirmingPin ? _buildAccountSidebar(theme, isDarkMode) : null,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+            return Row(
+              children: [
+                // Sidebar for larger screens
+                if (!_isConfirmingPin && !isMobile)
+                  SizedBox(
+                    width: 280,
+                    child: _buildAccountSidebar(theme, isDarkMode),
+                  ),
+                
+                // Main content
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                       const SizedBox(height: 32),
                       // Icon with animation
                       AnimatedSwitcher(
@@ -175,49 +199,122 @@ class _PinSetupScreenState extends State<PinSetupScreen> with SingleTickerProvid
                         ),
                       ],
                       
-                      // Account options section
-                      if (!_isConfirmingPin) ...[                  
-                        const SizedBox(height: 32),
-                        const Divider(),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Account Options',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          // Add padding at the bottom for scrolling
+                          const SizedBox(height: 32),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        _buildOptionCard(
-                          icon: Icons.person_add_outlined,
-                          title: 'Register New Account',
-                          subtitle: 'Create a new account with a different PIN',
-                          onTap: () {
-                            _showRegistrationDialog();
-                          },
-                          theme: theme,
-                          isDarkMode: isDarkMode,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildOptionCard(
-                          icon: Icons.help_outline,
-                          title: 'Forgot PIN?',
-                          subtitle: 'Reset your PIN if you forgot it',
-                          onTap: () {
-                            _showResetPinDialog();
-                          },
-                          theme: theme,
-                          isDarkMode: isDarkMode,
-                        ),
-                        // Add padding at the bottom for scrolling
-                        const SizedBox(height: 32),
-                      ],
-                    ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             );
           },
         ),
+      ),
+    );
+  }
+  
+  Widget _buildAccountSidebar(ThemeData theme, bool isDarkMode) {
+    return Container(
+      color: isDarkMode ? Colors.grey[850] : Colors.grey[100],
+      child: Column(
+        children: [
+          // Profile header
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+            color: theme.colorScheme.primary.withOpacity(0.1),
+            child: Column(
+              children: [
+                // Profile avatar
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: theme.colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 60,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'DomiNotes',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Secure Note Taking',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Account options
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Account Options',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildOptionCard(
+                  icon: Icons.person_add_outlined,
+                  title: 'Register New Account',
+                  subtitle: 'Create a new account with a different PIN',
+                  onTap: () {
+                    _showRegistrationDialog();
+                  },
+                  theme: theme,
+                  isDarkMode: isDarkMode,
+                ),
+                const SizedBox(height: 12),
+                _buildOptionCard(
+                  icon: Icons.help_outline,
+                  title: 'Forgot PIN?',
+                  subtitle: 'Reset your PIN if you forgot it',
+                  onTap: () {
+                    _showResetPinDialog();
+                  },
+                  theme: theme,
+                  isDarkMode: isDarkMode,
+                ),
+              ],
+            ),
+          ),
+          
+          const Spacer(),
+          
+          // App version at bottom
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'DomiNotes v1.0.0',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }

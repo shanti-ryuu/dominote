@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'providers/notes_provider.dart';
 import 'providers/folders_provider.dart';
@@ -16,6 +17,11 @@ import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Force cache refresh for web
+  if (kIsWeb) {
+    await Future.delayed(const Duration(milliseconds: 100));
+  }
   
   // Initialize services
   final databaseService = DatabaseService();
